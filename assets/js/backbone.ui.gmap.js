@@ -54,7 +54,9 @@
 					strokeColor: "#FF0000",
 					strokeWeight: 4
 				}
-			}
+			},
+			center : { lat: 37.774929, lng : -122.419416 }, // San Francisco
+			zoom : 13
 		},
 
 		events : {
@@ -62,7 +64,11 @@
 		},
 
 		initialize: function( options ){
-			this.data = new Data( this.options.data );
+			this.data = new Data({
+				//this.options.data
+				center: this.options.center,
+				zoom: this.options.zoom
+			});
 			return View.prototype.initialize.call(this, options);
 		},
 		/*
@@ -205,8 +211,8 @@
 
 	var Data = Backbone.Model.extend({
 		defaults:{
-			zoom : 13,
-			center : { lat: 37.774929, lng : -122.419416 }, // San Francisco
+			zoom : 0,
+			center : { lat: 0, lng : 0},
 			markers : []
 		}
 	});
