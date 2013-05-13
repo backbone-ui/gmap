@@ -147,22 +147,24 @@
 		  }
 		},
 
-		marker : function( coords, title ){
+		marker : function( point ){
 			// fallbacks
-			title = title || false;
+			point = point || false;
+			// prerequisites
+			if( !point || !point.lat || !point.lng ) return;
 			// set options
 			var options = {
-				position: new google.maps.LatLng( coords.lat, coords.lng ),
+				position: new google.maps.LatLng( point.lat, point.lng ),
 				// -33.86401046326108 hb: 151.1947818
 				map: this.map,
 				icon: this.options.icon
 			}
-			if( title ) options.title = title;
+			if( point.title ) options.title = point.title;
 			// add marker
 			new google.maps.Marker( options );
 			// save to model
 			var markers = this.model.get("markers");
-			markers.push( coords );
+			markers.push( point );
 			this.model.set({ markers : markers });
 		},
 
