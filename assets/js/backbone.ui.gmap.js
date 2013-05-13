@@ -56,7 +56,8 @@
 				}
 			},
 			center : { lat: 37.774929, lng : -122.419416 }, // San Francisco
-			zoom : 13
+			zoom : 13,
+			ui: true
 		},
 
 		events : {
@@ -145,7 +146,7 @@
 		  var data = this.model;
 		  return {
 			  zoom: data.get("zoom"),
-			  disableDefaultUI: true,
+			  disableDefaultUI: !(this.options.ui),
 			  scrollwheel: false,
 			  center: new google.maps.LatLng( data.get("center").lat, data.get("center").lng ),
 			  mapTypeId: google.maps.MapTypeId.ROADMAP,
