@@ -147,18 +147,23 @@
 		  }
 		},
 
-		marker : function( coords ){
-			return new google.maps.Marker({
+		marker : function( coords, title ){
+			// fallbacks
+			title = title || false;
+			// set options
+			var options = {
 				position: new google.maps.LatLng( coords.lat, coords.lng ),
 				// -33.86401046326108 hb: 151.1947818
 				map: this.map,
 				icon: this.options.icon
-				//title: 'A simple pin!'
-			});
+			}
+			if( title ) options.title = title;
+			// add marker
+			new google.maps.Marker( options );
 			// save to model
 			var markers = this.model.get("markers");
 			markers.push( coords );
-			this.model.get({ markers : markers });
+			this.model.set({ markers : markers });
 		},
 
 		polyline : function( coords ) {
