@@ -31,7 +31,29 @@
 	var Gmap = View.extend({
 
 		options: {
-			data : {}
+			data : {},
+			icon : "http://maps.google.com/mapfiles/kml/pushpin/grn-pushpin.png",
+			polyline: {
+				strokeColor: "#FF0000",
+				strokeOpacity: 1,
+				strokeWeight: 3
+			},
+			styles : [
+				{
+					featureType: "all",
+					elementType: "all",
+					stylers: [
+						{ saturation: 0 }
+					]
+				}
+			],
+			directions : {
+				suppressMarkers: true,
+				polylineOptions : {
+					strokeColor: "#FF0000",
+					strokeWeight: 4
+				}
+			}
 		},
 
 		events : {
@@ -86,51 +108,30 @@
 		},
 
 		inputAddress : function( e ){
-		 // passthrough everything except the enter key
-		 var key = e.keyCode || e.charCode || 0;
-		 if( key == 13){
-			 e.preventDefault();
-			 var address = $(e.target).val();
-			 gMap.route( address );
-			 // hide the input field?
-			 $(e.target).closest("div").hide();
-		 }
-		},
-
-		attributes : {
-		  // icon : "http://mjwadvertising.com.au/assets/img/kennel-red.png",
-		  styles : [
-			  {
-	   	 	featureType: "all",
-			  elementType: "all",
-			  stylers: [
-				{ saturation: -100 }
-			  ]
-			  }
-		  ],
-		  directions : {
-			  suppressMarkers: true,
-			  polylineOptions : {
-				strokeColor: "#FF0000",
-				strokeWeight: 4
-			  }
-		  }
+			// passthrough everything except the enter key
+			var key = e.keyCode || e.charCode || 0;
+			if( key == 13){
+				e.preventDefault();
+				var address = $(e.target).val();
+				gMap.route( address );
+				// hide the input field?
+				$(e.target).closest("div").hide();
+			}
 		},
 
 		init : function( el, model ){
-		 this.model = model;
-		  var options = this.setup();
-		  //
-			console.log(options);
-		  this.map = new google.maps.Map( this.el , options);
+			this.model = model;
+			var options = this.setup();
+			//
+			this.map = new google.maps.Map( this.el , options);
 			// init directions (optionally)
-		  if( this.model.get("input-address") ){
-			  this.directions = {
-				display : new google.maps.DirectionsRenderer( this.attributes.directions ),
-				service : new google.maps.DirectionsService()
-			  };
-			  this.directions.display.setMap( this.map );
-		  }
+			if( this.model.get("input-address") ){
+				this.directions = {
+					display : new google.maps.DirectionsRenderer( this.options.directions ),
+					service : new google.maps.DirectionsService()
+				};
+				this.directions.display.setMap( this.map );
+			}
 		},
 
 		setup : function(){
@@ -141,53 +142,55 @@
 			  scrollwheel: false,
 			  center: new google.maps.LatLng( data.get("center").lat, data.get("center").lng ),
 			  mapTypeId: google.maps.MapTypeId.ROADMAP,
-			  //styles : this.attributes.styles
+			  styles : this.options.styles
 		  }
 		},
 
 		marker : function( coords ){
-		  return new google.maps.Marker({
-			  position: new google.maps.LatLng( coords.lat, coords.lng ),
-	 // -33.86401046326108 hb: 151.1947818
-			  map: this.map,
-			  icon: this.attributes.icon
-			  //title: 'A simple pin!'
-		  });
+			return new google.maps.Marker({
+				position: new google.maps.LatLng( coords.lat, coords.lng ),
+				// -33.86401046326108 hb: 151.1947818
+				map: this.map,
+				icon: this.options.icon
+				//title: 'A simple pin!'
+			});
+			// save to model
+			var markers = this.model.get("markers");
+			markers.push( coords );
+			this.model.get({ markers : markers });
 		},
 
 		polyline : function( coords ) {
-		 var path = [];
-		 for(var i in coords){
-			 path.push( new google.maps.LatLng( coords.lat, coords.lng ) );
-		 }
 
-		  var options = {
-			  path: path,
-			  strokeColor: "#FF0000",
-			  strokeOpacity: 1,
-			  strokeWeight: 3
-		  }
-			  var it = new google.maps.Polyline( options );
-			  it.setMap(this.map);
+			var path = [];
+			for(var i in coords){
+				path.push( new google.maps.LatLng( coords.lat, coords.lng ) );
+			}
+
+			var options = this.options.polyline;
+			options.path = path;
+
+			var it = new google.maps.Polyline( options );
+			it.setMap(this.map);
 
 		},
 
-		route : function( address ) {
-		  // always end to the first marker (variable?)
-		  var self = this;
-		  // var destination = this.model.get("markers")[0];
+		route : function( address, destination ) {
+			var self = this,
+				data = this.model;
+			// where to end
+			destination = destination || data.get("center")
 
-		  var request = {
-			  origin: address,
-			  // destination: destination.lat +", "+ destination.lng,
-			  destination : "-33.86503,151.19342",
+			var request = {
+				origin: address,
+				destination: destination.lat +", "+ destination.lng,
 				travelMode: google.maps.DirectionsTravelMode.DRIVING
-		  };
-		  this.directions.service.route(request, function(response, status) {
-			  if (status == google.maps.DirectionsStatus.OK) {
-				self.directions.display.setDirections(response);
-			  }
-		  });
+			};
+			this.directions.service.route(request, function(response, status) {
+				if (status == google.maps.DirectionsStatus.OK) {
+					self.directions.display.setDirections(response);
+				}
+			});
 		}
 	});
 
