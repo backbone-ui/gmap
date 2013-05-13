@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+	<title>Static example of a map</title>
+
+	<!-- Base styles -->
+	<!-- link rel="stylesheet" href="../assets/css/backbone.ui.gmap.css" -->
+
+<style>
+	html, body, #map {
+		width: 100%;
+		height: 100%;
+		margin: 0;
+		padding: 0;
+	}
+	header {
+		position: absolute;
+		z-index: 99;
+	}
+</style>
+</head>
+<body>
+
+<header>
+	<p>This is a static execution of the plugin. there's no connection with a data model.</p>
+</header>
+
+<div id="map" class="ui-gmap"><!-- --></div>
+
+<!-- Dependencies -->
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/json3/3.2.4/json3.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js"></script>
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.0.0/backbone-min.js"></script>
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&amp;sensor=false"></script>
+
+<!-- Extension lib -->
+<script type="text/javascript" src="../assets/js/backbone.ui.gmap.js"></script>
+
+
+<script type="text/javascript">
+
+// LOGIC
+var map = new Backbone.UI.Gmap({
+		el : "#map"
+});
+
+map.render();
+</script>
+
+</body>
+</html>
