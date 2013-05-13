@@ -31,6 +31,7 @@
 	var Gmap = View.extend({
 
 		options: {
+			mapEl: false,
 			data : {},
 			icon : "http://maps.google.com/mapfiles/kml/pushpin/grn-pushpin.png",
 			polyline: {
@@ -96,7 +97,8 @@
 			// display (in case the container is hidden)
 			//$(this.el).show();
 			// initialize google map
-			this.init( $(this.el), this.data );
+			var map = ( !this.options.mapEl ) ? $(this.el) : $(this.options.mapEl);
+			this.init( map, this.data );
 			// add marker(s)
 			var markers = this.model.get("markers");
 			for( var i in markers ){
