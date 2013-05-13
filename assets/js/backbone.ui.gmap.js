@@ -88,8 +88,7 @@
 		*/
 
 		// override default render() to include map initialization
-		render : function(){
-			console.log("render");
+		postRender : function(){
 			//if( !this.data || !this.template ) return;
 			//console.log( this.data );
 			//var html = this.template( this.data.toJSON() );

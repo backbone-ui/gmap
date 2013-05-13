@@ -39,11 +39,16 @@
 
 
 <script type="text/javascript">
+var MyMap = Backbone.UI.Gmap.extend({
+	el : "#map",
+	render: function(){
+		// no "real" render - just initializing map
+		this.postRender();
+	}
+});
 
 // LOGIC
-var map = new Backbone.UI.Gmap({
-		el : "#map"
-});
+var map = new MyMap();
 
 map.render();
 </script>
