@@ -1,18 +1,48 @@
-APP.Models.Map = Backbone.Model.extend({
-		defaults: { 
-			zoom : 16, 
+// Backbone.js Modal extension
+//
+// Created by: Lyndel Thomas (@ryndel)
+// Source: https://github.com/backbone-ui/gmap
+//
+// Licensed under the MIT license:
+// http://makesites.org/licenses/MIT
+
+
+// AMD wrapper from https://github.com/umdjs/umd/blob/master/amdWebGlobal.js
+
+(function (root, factory) {
+	if (typeof define === 'function' && define.amd) {
+		// AMD. Register as an anonymous module and set browser global
+		define(['underscore', 'backbone'], function (_, Backbone) {
+			return (root.Backbone = factory(_, Backbone));
+		});
+	} else {
+		// Browser globals
+		root.Backbone = factory(root._, root.Backbone);
+	}
+}(this, function (_, Backbone) {
+
+	// fallbacks
+	if( _.isUndefined( Backbone.UI ) ) Backbone.UI = {};
+
+	// conditioning the existance of the Backbone APP()
+	var View = ( APP ) ? APP.View : Backbone.View;
+
+
+	var Data = Backbone.Model.extend({
+		defaults: {
+			zoom : 16,
 			center : { lat: -33.86630, lng : 151.19478180 },
 			markers : [
 				{ lat: -33.8630, lng : 151.19528999 }
 			]
 		}
 	});
-	
-	
-	
-	APP.Views.ShowMap = Backbone.View.extend({
-		el: "#show-map", 
-		
+
+
+
+	var Gmap = View.extend({
+		el: "#show-map",
+
 		initialize : function(e){
 			var self = this;
 			// e.preventDefault();
@@ -21,11 +51,11 @@ APP.Models.Map = Backbone.Model.extend({
 			//self.model.set({ "input-address" :  input });
 			// display the polyline on the 'static' map
 			//var polyline = !input;
-			
+
 			var map = new APP.Views.Map({
 				// model : self.model,
 				template : "assets/html/map.html",
-				scroll : false, 
+				scroll : false,
 				// polyline : polyline
 			});
 		}
@@ -35,31 +65,31 @@ APP.Models.Map = Backbone.Model.extend({
 APP.Views.Map = APP.View.extend({
 		events : _.extend({}, Backbone.UI.Modal.prototype.events, {
 			"keypress .input-address input" : "inputAddress"
-		}), 
+		}),
 		// initialize: function( options ){
 		//	$(this.el).unbind();
 		//	return Backbone.UI.Modal.prototype.initialize.call(this, options);
-		// }, 
+		// },
 		/*
 		initialize: function( options ){
 			_.bindAll(this, 'compile', 'render');
-			
-			
+
+
 			console.log( this.options );
-			
+
 			// fetch the template file
 			if( options.template ){
 				$.get(options.template, this.compile);
 			}
-			
+
 			//this.template = Handlebars.compile( options.template )
-			
-		}, 
+
+		},
 		compile : function( html ){
 			this.template = Handlebars.compile( html );
 			// attempt to render straight away
 			this.render();
-		}, 
+		},
 		*/
 		// override default render() to include map initialization
 		render : function(){
@@ -82,7 +112,7 @@ APP.Views.Map = APP.View.extend({
 			this.scroll( false );
 			this.center();
 		},
-		
+
 		inputAddress : function( e ){
 			// passthrough everything except the enter key
 			var key = e.keyCode || e.charCode || 0;
@@ -94,36 +124,36 @@ APP.Views.Map = APP.View.extend({
 				$(e.target).closest("div").hide();
 			}
 		}
-		
+
 	});
 
 
 var gMap = {
-	
+
 	attributes : {
-		// icon : "http://mjwadvertising.com.au/assets/img/kennel-red.png", 
+		// icon : "http://mjwadvertising.com.au/assets/img/kennel-red.png",
 		styles : [
 			{
 			  featureType: "all",
 			  elementType: "all",
 			  stylers: [
-				{ saturation: -100 } 
+				{ saturation: -100 }
 			  ]
 			}
-		], 
+		],
 		directions : {
-			suppressMarkers: true, 
-			polylineOptions : { 
-				strokeColor: "#FF0000", 
-				strokeWeight: 4 
-			} 
+			suppressMarkers: true,
+			polylineOptions : {
+				strokeColor: "#FF0000",
+				strokeWeight: 4
+			}
 		}
-	}, 
-	
+	},
+
 	init : function( el, model ){
 		this.model = model;
 		var options = this.setup();
-		// 
+		//
 		this.map = new google.maps.Map(document.getElementById("contact-map") , options);
 		// init directions (optionally)
 		if( this.model.get("input-address") ){
@@ -133,8 +163,8 @@ var gMap = {
 			};
 			this.directions.display.setMap( this.map );
 		}
-	}, 
-	
+	},
+
 	setup : function(){
 		var data = this.model;
 		return {
@@ -144,9 +174,9 @@ var gMap = {
 			center: new google.maps.LatLng( data.get("center").lat, data.get("center").lng ),
 			mapTypeId: google.maps.MapTypeId.ROADMAP,
 			styles : this.attributes.styles
-		}	
-	}, 
-	
+		}
+	},
+
 	marker : function( coords ){
 		return new google.maps.Marker({
 			position: new google.maps.LatLng( coords.lat, coords.lng ),
@@ -156,9 +186,9 @@ var gMap = {
 			//title: 'A simple pin!'
 		});
 	},
-	
+
 	polyline : function() {
-	
+
 		var myCoordinates = [
 			new google.maps.LatLng(-33.869284,151.193665),
 			new google.maps.LatLng(-33.867547,151.192700),
@@ -178,14 +208,14 @@ var gMap = {
 			it.setMap(this.map);
 
 	},
-	
-    route : function( address ) {
+
+	route : function( address ) {
 		// always end to the first marker (variable?)
 		var self = this;
 		// var destination = this.model.get("markers")[0];
-		
 
-		
+
+
 		var request = {
 			origin: address,
 			// destination: destination.lat +", "+ destination.lng,
@@ -202,4 +232,10 @@ var gMap = {
 
 //google.maps.event.addDomListener(window, 'load', loadMap);
 
+	});
 
+	// Export
+	Backbone.UI.Gmap = Gmap;
+
+	return Backbone;
+}));
